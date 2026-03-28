@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.travel.grpc";
+
+service IntegrationGrpcService {
+
+  rpc CalculateEcoFootprint(GrpcRouteRequest) returns (GrpcEcoResponse);
+  rpc GetTravelAdvice(GrpcAdviceRequest) returns (GrpcAdviceResponse);
+}
+
+message GrpcRouteRequest {
+  repeated GrpcRouteSegment segments = 1;
+}
+message GrpcAdviceRequest {
+  string destinationCity = 1;
+  string destinationCountry = 2;
+}
+
+message GrpcEcoResponse {
+  double totalCo2Kg = 1;
+  repeated string segmentDetails = 2;
+  repeated double segment_co2_values = 3;
+}
+message GrpcAdviceResponse {
+  repeated string packingList = 1;
+  repeated string safetyTips = 2;
+  string weatherAdvice = 3;
+  string emergencyContacts = 4;
+}
+message GrpcRouteSegment {
+  string fromCity = 1;
+  string toCity = 2;
+  string toCountry = 3;
+  string transportType = 4;
+  double distanceKm = 5;
+}
+
