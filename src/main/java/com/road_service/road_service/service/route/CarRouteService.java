@@ -1,7 +1,7 @@
 package com.road_service.road_service.service.route;
 
-import com.road_service.road_service.dto.request.RouteOption;
-import com.road_service.road_service.dto.request.RouteSegmentRequest;
+import com.road_service.road_service.dto.dto.RouteOptionDTO;
+import com.road_service.road_service.dto.dto.RouteSegmentDTO;
 import com.road_service.road_service.entity.CityEntity;
 import com.road_service.road_service.integretion.GeoRoutingClient;
 import com.road_service.road_service.utils.MathUtils;
@@ -17,9 +17,9 @@ public class CarRouteService {
 
     private final GeoRoutingClient geoRoutingClient;
 
-    public RouteOption build(List<CityEntity> chain) {
+    public RouteOptionDTO build(List<CityEntity> chain) {
 
-        List<RouteSegmentRequest> segments = new ArrayList<>();
+        List<RouteSegmentDTO> segments = new ArrayList<>();
 
         double totalDist = 0;
         double totalDur = 0;
@@ -37,7 +37,7 @@ public class CarRouteService {
             double distKm = routeInfo[0];
             double durHrs = routeInfo[1];
 
-            segments.add(new RouteSegmentRequest(
+            segments.add(new RouteSegmentDTO(
                     from.getName(), from.getCountry(),
                     to.getName(), to.getCountry(),
                     "АВТО", MathUtils.round(distKm), MathUtils.round(durHrs), 0.0
@@ -47,6 +47,6 @@ public class CarRouteService {
             totalDur += durHrs;
         }
 
-        return new RouteOption("Автомобиль", MathUtils.round(totalDist), MathUtils.round(totalDur), 0.0, segments);
+        return  RouteOptionDTO.available("Автомобиль", MathUtils.round(totalDist), MathUtils.round(totalDur), 0.0, segments);
     }
 }

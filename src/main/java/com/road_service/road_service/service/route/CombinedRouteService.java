@@ -1,7 +1,7 @@
 package com.road_service.road_service.service.route;
 
-import com.road_service.road_service.dto.request.RouteOption;
-import com.road_service.road_service.dto.request.RouteSegmentRequest;
+import com.road_service.road_service.dto.dto.RouteOptionDTO;
+import com.road_service.road_service.dto.dto.RouteSegmentDTO;
 import com.road_service.road_service.entity.CityEntity;
 import com.road_service.road_service.strategy.*;
 import com.road_service.road_service.utils.MathUtils;
@@ -28,14 +28,14 @@ public class CombinedRouteService {
         return List.of(trainBuilder, suburbanBuilder, busBuilder, marshrutkaBuilder, flightBuilder);
     }
 
-    public RouteOption buildMixedRoute(List<CityEntity> chain) {
+    public RouteOptionDTO buildMixedRoute(List<CityEntity> chain) {
 
         if (chain.size() < 3) {
-            return RouteOption.unavailable("Смешанный",
+            return RouteOptionDTO.unavailable("Смешанный",
                     "Смешанный маршрут возможен только при наличии промежуточных остановок");
         }
 
-        List<RouteSegmentRequest> segments = new ArrayList<>();
+        List<RouteSegmentDTO> segments = new ArrayList<>();
         double totalDist = 0;
         double totalDur = 0;
 
@@ -46,7 +46,7 @@ public class CombinedRouteService {
             CityEntity from = chain.get(i);
             CityEntity to = chain.get(i + 1);
 
-            Optional<RouteSegmentRequest> segment = Optional.empty();
+            Optional<RouteSegmentDTO> segment = Optional.empty();
 
             for (SegmentBuilder builder : getAllBuilders()) {
                 segment = builder.buildSegment(from, to);
@@ -54,7 +54,7 @@ public class CombinedRouteService {
             }
 
             if (segment.isEmpty()) {
-                return RouteOption.unavailable("Смешанный",
+                return RouteOptionDTO.unavailable("Смешанный",
                         "Нет доступного транспорта между г. " + from.getName() + " и г. " + to.getName());
             }
 
@@ -66,10 +66,10 @@ public class CombinedRouteService {
         }
 
         if (transportTypes.size() < 2) {
-            return RouteOption.unavailable("Смешанный",
+            return RouteOptionDTO.unavailable("Смешанный",
                     "На данном маршруте выгоднее использовать один вид транспорта без пересадок на другие типы");
         }
 
-        return new RouteOption("Смешанный", MathUtils.round(totalDist), MathUtils.round(totalDur), 0.0, segments);
+        return  RouteOptionDTO.available("Смешанный", MathUtils.round(totalDist), MathUtils.round(totalDur), 0.0, segments);
     }
 }

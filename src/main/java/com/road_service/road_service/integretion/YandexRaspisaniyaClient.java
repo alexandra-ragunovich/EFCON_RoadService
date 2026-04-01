@@ -13,6 +13,22 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class YandexRaspisaniyaClient {
 
+    private static final String TRANSPORT_TRAIN = "ПОЕЗД";
+    private static final String TRANSPORT_FLIGHT = "САМОЛЕТ";
+    private static final String TRANSPORT_SUBURBAN = "ЭЛЕКТРИЧКА";
+    private static final String TRANSPORT_BUS = "АВТОБУС";
+    private static final String TRANSPORT_MINIBUS = "МАРШРУТКА";
+    private static final String YANDEX_TYPE_TRAIN = "train";
+    private static final String YANDEX_TYPE_SUBURBAN = "suburban";
+    private static final String YANDEX_TYPE_PLANE = "plane";
+    private static final String YANDEX_TYPE_BUS = "bus";
+    private static final String YANDEX_TYPE_UNKNOWN = "unknown";
+    private static final double METERS_IN_KM = 1000.0;
+    private static final double SECONDS_IN_HOUR = 3600.0;
+    private static final String SEARCH_ENDPOINT = "/search/?apikey=";
+    private static final String STATIONS_LIST_ENDPOINT = "/stations_list/?apikey=";
+    private static final String FLIGHT_SEARCH_PARAMS = "&transport_types=plane&system=iata&format=json&limit=1";
+    private static final String ROUTE_SEARCH_PARAMS = "&format=json&limit=1";
     private final RestClient restClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Map<String, List<StationInfo>> cityStationsCache = new ConcurrentHashMap<>();
@@ -46,10 +62,10 @@ public class YandexRaspisaniyaClient {
 
     public double[] findFlightByIata(String fromIata, String toIata) {
         try {
-            String url = apiUrl + "/search/?apikey=" + apiKey
+            String url = apiUrl + SEARCH_ENDPOINT + apiKey
                     + "&from=" + fromIata
                     + "&to=" + toIata
-                    + "&transport_types=plane&system=iata&format=json&limit=1";
+                    + FLIGHT_SEARCH_PARAMS;
 
             String body = restClient.get().uri(url).accept(MediaType.APPLICATION_JSON)
                     .retrieve().body(String.class);
@@ -64,7 +80,7 @@ public class YandexRaspisaniyaClient {
     private void loadStationsForCity(String cityName) {
         if (cityStationsCache.containsKey(cityName)) return;
 
-        String url = apiUrl + "/stations_list/?apikey=" + apiKey + "&format=json&lang=ru_RU";
+        String url = apiUrl + STATIONS_LIST_ENDPOINT + apiKey + "&format=json&lang=ru_RU";
 
         try {
             String body = restClient.get().uri(url).accept(MediaType.APPLICATION_JSON)
@@ -124,7 +140,7 @@ public class YandexRaspisaniyaClient {
                                 currentCity,
                                 stationName != null ? stationName : currentCity,
                                 yandexCode,
-                                transportType != null ? transportType : "unknown"
+                                transportType != null ? transportType : YANDEX_TYPE_UNKNOWN
                         ));
 
                         stationName = null;
@@ -151,9 +167,9 @@ public class YandexRaspisaniyaClient {
 
         String type = translateTransport(transportType);
 
-        if (type.equals("train")) {
+        if (type.equals(YANDEX_TYPE_TRAIN)) {
             String code = stations.stream()
-                    .filter(s -> (s.type().equals("train") || s.type().equals("suburban")))
+                    .filter(s -> (s.type().equals(YANDEX_TYPE_TRAIN) || s.type().equals(YANDEX_TYPE_SUBURBAN)))
                     .filter(s -> matchesCity(s.city(), city))
                     .map(StationInfo::code)
                     .findFirst()
@@ -162,15 +178,15 @@ public class YandexRaspisaniyaClient {
             if (code != null) return code;
 
             return stations.stream()
-                    .filter(s -> s.type().equals("train") || s.type().equals("suburban"))
+                    .filter(s -> s.type().equals(YANDEX_TYPE_TRAIN) || s.type().equals(YANDEX_TYPE_SUBURBAN))
                     .map(StationInfo::code)
                     .findFirst()
                     .orElse(null);
         }
 
-        if (type.equals("suburban")) {
+        if (type.equals(YANDEX_TYPE_SUBURBAN)) {
             return stations.stream()
-                    .filter(s -> s.type().equals("suburban"))
+                    .filter(s -> s.type().equals(YANDEX_TYPE_SUBURBAN))
                     .map(StationInfo::code)
                     .findFirst()
                     .orElse(null);
@@ -186,11 +202,11 @@ public class YandexRaspisaniyaClient {
 
     private double[] findRouteByCodes(String from, String to, String transportType) {
         try {
-            String url = apiUrl + "/search/?apikey=" + apiKey
+            String url = apiUrl +SEARCH_ENDPOINT + apiKey
                     + "&from=" + from
                     + "&to=" + to
                     + "&transport_types=" + translateTransport(transportType)
-                    + "&format=json&limit=1";
+                    + ROUTE_SEARCH_PARAMS;
 
             String body = restClient.get().uri(url).accept(MediaType.APPLICATION_JSON)
                     .retrieve().body(String.class);
@@ -211,9 +227,9 @@ public class YandexRaspisaniyaClient {
 
         var seg = segments.get(0);
 
-        double durationHours = seg.get("duration").asDouble() / 3600.0;
+        double durationHours = seg.get("duration").asDouble() / SECONDS_IN_HOUR;
         double distanceKm = seg.has("distance") && !seg.get("distance").isNull()
-                ? seg.get("distance").asDouble() / 1000.0
+                ? seg.get("distance").asDouble() / METERS_IN_KM
                 : 0.0;
 
         return new double[]{durationHours, distanceKm};
@@ -221,11 +237,11 @@ public class YandexRaspisaniyaClient {
 
     private String translateTransport(String t) {
         return switch (t.toUpperCase()) {
-            case "ПОЕЗД" -> "train";
-            case "САМОЛЕТ" -> "plane";
-            case "ЭЛЕКТРИЧКА" -> "suburban";
-            case "АВТОБУС", "МАРШРУТКА" -> "bus";
-            default -> "bus";
+            case TRANSPORT_TRAIN -> YANDEX_TYPE_TRAIN;
+            case TRANSPORT_FLIGHT -> YANDEX_TYPE_PLANE;
+            case TRANSPORT_SUBURBAN -> YANDEX_TYPE_SUBURBAN;
+            case TRANSPORT_BUS , TRANSPORT_MINIBUS -> YANDEX_TYPE_BUS;
+            default -> YANDEX_TYPE_BUS;
         };
     }
 }

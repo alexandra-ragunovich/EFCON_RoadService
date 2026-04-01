@@ -29,7 +29,6 @@
 
     <properties>
         <java.version>17</java.version>
-        <!-- ДОБАВИЛИ: Версии плагинов для генерации gRPC кода -->
         <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
         <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
     </properties>
@@ -76,7 +75,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- ДОБАВИЛИ: Библиотеки gRPC -->
         <dependency>
             <groupId>net.devh</groupId>
             <artifactId>grpc-spring-boot-starter</artifactId>
@@ -100,7 +98,7 @@
     </dependencies>
 
     <build>
-        <!-- ДОБАВИЛИ: Расширение, чтобы Maven понимал, на Маке ты или на Windows -->
+
         <extensions>
             <extension>
                 <groupId>kr.motd.maven</groupId>
@@ -134,8 +132,6 @@
                     </excludes>
                 </configuration>
             </plugin>
-
-            <!-- ДОБАВИЛИ: Плагин, который превращает файл .proto в готовые Java классы -->
             <plugin>
                 <groupId>org.xolstice.maven.plugins</groupId>
                 <artifactId>protobuf-maven-plugin</artifactId>

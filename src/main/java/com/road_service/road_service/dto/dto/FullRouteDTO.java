@@ -1,4 +1,4 @@
-package com.road_service.road_service.dto.request;
+package com.road_service.road_service.dto.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FullRouteRequest {
+public class FullRouteDTO {
 
-    private List<RouteSegmentRequest> segments;
+    private List<RouteSegmentDTO> segments;
 }

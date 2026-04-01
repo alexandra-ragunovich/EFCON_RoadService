@@ -1,4 +1,4 @@
-package com.road_service.road_service.dto.request;
+package com.road_service.road_service.dto.dto;
 
 import lombok.AllArgsConstructor;
 
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RouteSegmentRequest {
+public class RouteSegmentDTO {
 
     private String fromCity;
     private String fromCountry;

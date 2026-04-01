@@ -1,10 +1,10 @@
 package com.road_service.road_service.service;
 
 import com.road_service.road_service.dto.request.RouteBuildRequest;
-import com.road_service.road_service.dto.request.RouteOption;
-import com.road_service.road_service.dto.request.RouteSegmentRequest;
+import com.road_service.road_service.dto.dto.RouteOptionDTO;
+import com.road_service.road_service.dto.dto.RouteSegmentDTO;
 import com.road_service.road_service.dto.response.FullRouteResponse;
-import com.road_service.road_service.dto.response.TravelAdviceDto;
+import com.road_service.road_service.dto.dto.TravelAdviceDTO;
 import com.road_service.road_service.entity.CityEntity;
 import com.road_service.road_service.grpc.IntegrationGrpcClient;
 import com.road_service.road_service.repository.CityRepository;
@@ -44,9 +44,9 @@ public class RoutePlanningService {
 
         List<CityEntity> carChain = cityChainBuilder.buildCarChain(startCity, endCity, request.getWaypointsCount());
         List<CityEntity> transportChain = cityChainBuilder.buildTransportChain(startCity, endCity, request.getWaypointsCount());
-        List<RouteOption> options = new ArrayList<>();
+        List<RouteOptionDTO> options = new ArrayList<>();
 
-        RouteOption carOption = carRouteService.build(carChain);
+        RouteOptionDTO carOption = carRouteService.build(carChain);
         carOption.setRouteName("Автомобиль");
         options.add(carOption);
         options.add(buildSingleTransportRoute("Поезд", transportChain, trainBuilder));
@@ -58,7 +58,7 @@ public class RoutePlanningService {
 
         ecoProcessor.processAndSort(options);
 
-        TravelAdviceDto advice = null;
+        TravelAdviceDTO advice = null;
 
         try {
             advice = integrationGrpcClient.fetchTravelAdvice(
@@ -77,9 +77,9 @@ public class RoutePlanningService {
         );
     }
 
-    private RouteOption buildSingleTransportRoute(String routeName, List<CityEntity> chain, SegmentBuilder builder) {
+    private RouteOptionDTO buildSingleTransportRoute(String routeName, List<CityEntity> chain, SegmentBuilder builder) {
 
-        List<RouteSegmentRequest> segments = new ArrayList<>();
+        List<RouteSegmentDTO> segments = new ArrayList<>();
         double totalDist = 0;
         double totalDur = 0;
 
@@ -88,9 +88,9 @@ public class RoutePlanningService {
             CityEntity from = chain.get(i);
             CityEntity to = chain.get(i + 1);
 
-            Optional<RouteSegmentRequest> segment = builder.buildSegment(from, to);
+            Optional<RouteSegmentDTO> segment = builder.buildSegment(from, to);
             if (segment.isEmpty()) {
-                return RouteOption.unavailable(routeName,
+                return RouteOptionDTO.unavailable(routeName,
                         String.format("Нет рейса (%s) между г. %s и г. %s", routeName.toLowerCase(), from.getName(), to.getName()));
             }
 
@@ -99,7 +99,7 @@ public class RoutePlanningService {
             totalDur += segment.get().getDurationHours();
         }
 
-        return new RouteOption(routeName, MathUtils.round(totalDist), MathUtils.round(totalDur), 0.0, segments);
+        return  RouteOptionDTO.available(routeName, MathUtils.round(totalDist), MathUtils.round(totalDur), 0.0, segments);
     }
 
     private CityEntity findCity(String name, String country) {

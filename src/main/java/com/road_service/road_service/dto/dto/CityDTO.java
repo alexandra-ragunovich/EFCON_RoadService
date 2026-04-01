@@ -1,9 +1,9 @@
-package com.road_service.road_service.dto.request;
+package com.road_service.road_service.dto.dto;
 
 import lombok.Data;
 
 @Data
-public class CityDto {
+public class CityDTO {
 
     private Long id;
     private String name;

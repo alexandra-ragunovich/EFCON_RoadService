@@ -1,6 +1,6 @@
 package com.road_service.road_service.service.segment;
 
-import com.road_service.road_service.dto.request.RouteSegmentRequest;
+import com.road_service.road_service.dto.dto.RouteSegmentDTO;
 import com.road_service.road_service.entity.CityEntity;
 import com.road_service.road_service.entity.TransportRouteEntity;
 import com.road_service.road_service.repository.TransportRouteRepository;
@@ -20,13 +20,13 @@ public class RouteSegmentService {
     private final GeoCalculator geoCalculator;
 
 
-    public Optional<RouteSegmentRequest> findSegment(
+    public Optional<RouteSegmentDTO> findSegment(
             CityEntity from,
             CityEntity to,
             String transportType,
             SegmentProvider provider) {
 
-        Optional<RouteSegmentRequest> dbResult = findInDatabase(from, to, transportType);
+        Optional<RouteSegmentDTO> dbResult = findInDatabase(from, to, transportType);
         if (dbResult.isPresent()) {
             return dbResult;
         }
@@ -34,7 +34,7 @@ public class RouteSegmentService {
         return provider.findSegment(from, to, transportType);
     }
 
-    private Optional<RouteSegmentRequest> findInDatabase(CityEntity from, CityEntity to, String transportType) {
+    private Optional<RouteSegmentDTO> findInDatabase(CityEntity from, CityEntity to, String transportType) {
         List<TransportRouteEntity> forwardRoutes = transportRouteRepository.findByFromCityId(from.getId());
 
         Optional<TransportRouteEntity> directMatch = forwardRoutes.stream()
@@ -57,9 +57,9 @@ public class RouteSegmentService {
         return Optional.empty();
     }
 
-    private RouteSegmentRequest mapToRequest(TransportRouteEntity route, CityEntity from, CityEntity to) {
+    private RouteSegmentDTO mapToRequest(TransportRouteEntity route, CityEntity from, CityEntity to) {
         double dist = geoCalculator.distance(from, to) * 1.2;
-        return new RouteSegmentRequest(
+        return new RouteSegmentDTO(
                 from.getName(),
                 from.getCountry(),
                 to.getName(),
@@ -73,6 +73,6 @@ public class RouteSegmentService {
 
 
     public interface SegmentProvider {
-        Optional<RouteSegmentRequest> findSegment(CityEntity from, CityEntity to, String transportType);
+        Optional<RouteSegmentDTO> findSegment(CityEntity from, CityEntity to, String transportType);
     }
 }

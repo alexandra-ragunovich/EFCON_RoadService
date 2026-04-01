@@ -1,7 +1,7 @@
 package com.road_service.road_service.grpc;
 
-import com.road_service.road_service.dto.request.FullRouteRequest;
-import com.road_service.road_service.dto.response.TravelAdviceDto;
+import com.road_service.road_service.dto.dto.FullRouteDTO;
+import com.road_service.road_service.dto.dto.TravelAdviceDTO;
 import com.road_service.road_service.mapper.RouteMapper;
 import com.travel.grpc.*;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ public class IntegrationGrpcClient {
     private IntegrationGrpcServiceGrpc.IntegrationGrpcServiceBlockingStub grpcStub;
     private final RouteMapper routeMapper;
 
-    public Map<String, Object> fetchEcoReportFromGrpc(FullRouteRequest routeRequest) {
+    public Map<String, Object> fetchEcoReportFromGrpc(FullRouteDTO routeRequest) {
 
         GrpcRouteRequest request = GrpcRouteRequest.newBuilder()
                 .addAllSegments(routeMapper.toGrpcSegments(routeRequest.getSegments()))
@@ -31,7 +31,7 @@ public class IntegrationGrpcClient {
                 "segment_co2_values", response.getSegmentCo2ValuesList()
         );
     }
-    public TravelAdviceDto fetchTravelAdvice(String city, String country) {
+    public TravelAdviceDTO fetchTravelAdvice(String city, String country) {
         GrpcAdviceRequest request = GrpcAdviceRequest.newBuilder()
                 .setDestinationCity(city)
                 .setDestinationCountry(country)
@@ -39,7 +39,7 @@ public class IntegrationGrpcClient {
 
         GrpcAdviceResponse response = grpcStub.getTravelAdvice(request);
 
-        return new TravelAdviceDto(
+        return new TravelAdviceDTO(
                 response.getPackingListList(),
                 response.getSafetyTipsList(),
                 response.getWeatherAdvice(),

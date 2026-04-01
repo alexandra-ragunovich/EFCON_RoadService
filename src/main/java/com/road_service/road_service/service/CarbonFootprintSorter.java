@@ -1,7 +1,7 @@
 package com.road_service.road_service.service;
 
-import com.road_service.road_service.dto.request.FullRouteRequest;
-import com.road_service.road_service.dto.request.RouteOption;
+import com.road_service.road_service.dto.dto.FullRouteDTO;
+import com.road_service.road_service.dto.dto.RouteOptionDTO;
 import com.road_service.road_service.grpc.IntegrationGrpcClient;
 import com.road_service.road_service.utils.MathUtils;
 import lombok.RequiredArgsConstructor;
@@ -16,19 +16,19 @@ public class CarbonFootprintSorter {
 
     private final IntegrationGrpcClient carbonGrpcClient;
 
-    public void processAndSort(List<RouteOption> options) {
+    public void processAndSort(List<RouteOptionDTO> options) {
 
-        for (RouteOption option : options) {
+        for (RouteOptionDTO option : options) {
             calculateCo2(option);
         }
 
-        options.sort(Comparator.comparingDouble(RouteOption::getTotalCo2Kg));
+        options.sort(Comparator.comparingDouble(RouteOptionDTO::getTotalCo2Kg));
     }
 
-    private void calculateCo2(RouteOption option) {
+    private void calculateCo2(RouteOptionDTO option) {
 
         try {
-            FullRouteRequest request = new FullRouteRequest(option.getSegments());
+            FullRouteDTO request = new FullRouteDTO(option.getSegments());
             var ecoReport = carbonGrpcClient.fetchEcoReportFromGrpc(request);
 
             double totalCo2 = (double) ecoReport.get("total_co2_kg");

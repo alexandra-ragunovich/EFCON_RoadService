@@ -1,6 +1,6 @@
 package com.road_service.road_service.mapper;
 
-import com.road_service.road_service.dto.request.RouteSegmentRequest;
+import com.road_service.road_service.dto.dto.RouteSegmentDTO;
 import com.travel.grpc.GrpcRouteSegment;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 @Component
 public class RouteMapper {
 
-    public GrpcRouteSegment toGrpcSegment(RouteSegmentRequest segment) {
+    public GrpcRouteSegment toGrpcSegment(RouteSegmentDTO segment) {
         return GrpcRouteSegment.newBuilder()
                 .setFromCity(segment.getFromCity())
                 .setToCity(segment.getToCity())
@@ -21,7 +21,7 @@ public class RouteMapper {
     }
 
 
-    public List<GrpcRouteSegment> toGrpcSegments(List<RouteSegmentRequest> segments) {
+    public List<GrpcRouteSegment> toGrpcSegments(List<RouteSegmentDTO> segments) {
         return segments.stream()
                 .map(this::toGrpcSegment)
                 .collect(Collectors.toList());

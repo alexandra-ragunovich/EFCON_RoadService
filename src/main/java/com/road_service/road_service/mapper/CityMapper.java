@@ -1,15 +1,15 @@
 package com.road_service.road_service.mapper;
 
-import com.road_service.road_service.dto.request.CityDto;
+import com.road_service.road_service.dto.dto.CityDTO;
 import com.road_service.road_service.entity.CityEntity;
 import lombok.Data;
 
 @Data
 public class CityMapper {
-    public static CityDto toDto(CityEntity entity) {
+    public static CityDTO toDto(CityEntity entity) {
         if (entity == null) return null;
 
-        CityDto dto = new CityDto();
+        CityDTO dto = new CityDTO();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
         dto.setCountry(entity.getCountry());
@@ -20,7 +20,7 @@ public class CityMapper {
         return dto;
     }
 
-    public static CityEntity toEntity(CityDto dto) {
+    public static CityEntity toEntity(CityDTO dto) {
         if (dto == null) return null;
 
         CityEntity entity = new CityEntity();

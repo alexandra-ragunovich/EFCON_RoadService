@@ -1,6 +1,6 @@
 package com.road_service.road_service.strategy;
 
-import com.road_service.road_service.dto.request.RouteSegmentRequest;
+import com.road_service.road_service.dto.dto.RouteSegmentDTO;
 import com.road_service.road_service.entity.CityEntity;
 import com.road_service.road_service.integretion.YandexRaspisaniyaClient;
 import com.road_service.road_service.service.GeoCalculator;
@@ -25,12 +25,12 @@ public class SuburbanSegmentBuilder implements SegmentBuilder {
     }
 
     @Override
-    public Optional<RouteSegmentRequest> buildSegment(CityEntity from, CityEntity to) {
+    public Optional<RouteSegmentDTO> buildSegment(CityEntity from, CityEntity to) {
 
         return segmentService.findSegment(from, to, "ЭЛЕКТРИЧКА", (f, t, type) -> findInYandex(f, t));
     }
 
-    private Optional<RouteSegmentRequest> findInYandex(CityEntity from, CityEntity to) {
+    private Optional<RouteSegmentDTO> findInYandex(CityEntity from, CityEntity to) {
 
         double[] yandexResult = yandexClient.findRoute(from.getName(), to.getName(), "ЭЛЕКТРИЧКА");
 
@@ -43,7 +43,7 @@ public class SuburbanSegmentBuilder implements SegmentBuilder {
                 ? yandexResult[1]
                 : geoCalculator.distance(from, to) * 1.2;
 
-        return Optional.of(new RouteSegmentRequest(from.getName(), from.getCountry(), to.getName(), to.getCountry(), "ЭЛЕКТРИЧКА", MathUtils.round(distanceKm), MathUtils.round(durationHours), 0.0
+        return Optional.of(new RouteSegmentDTO(from.getName(), from.getCountry(), to.getName(), to.getCountry(), "ЭЛЕКТРИЧКА", MathUtils.round(distanceKm), MathUtils.round(durationHours), 0.0
         ));
     }
 }
