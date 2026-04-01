@@ -21,7 +21,7 @@ public class RouteOptionDTO {
     private String errorMessage;
 
     public static RouteOptionDTO available(String routeName, double totalDistanceKm, double totalDurationHours, double totalCo2Kg, List<RouteSegmentDTO> segments){
-        return new RouteOptionDTO(routeName, 0.0, 0.0, 0.0, new ArrayList<>(), true, null);
+        return new RouteOptionDTO(routeName, totalDistanceKm, totalDurationHours, totalCo2Kg, segments, true, null);
     }
     public static RouteOptionDTO unavailable(String routeName, String errorMessage) {
         return new RouteOptionDTO(routeName, 0.0, 0.0, 0.0, new ArrayList<>(), false, errorMessage);
