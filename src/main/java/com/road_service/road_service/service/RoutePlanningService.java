@@ -6,6 +6,7 @@ import com.road_service.road_service.dto.dto.RouteSegmentDTO;
 import com.road_service.road_service.dto.response.FullRouteResponse;
 import com.road_service.road_service.dto.dto.TravelAdviceDTO;
 import com.road_service.road_service.entity.CityEntity;
+import com.road_service.road_service.dto.dto.CityDTO;
 import com.road_service.road_service.grpc.IntegrationGrpcClient;
 import com.road_service.road_service.repository.CityRepository;
 import com.road_service.road_service.service.route.CarRouteService;
@@ -101,7 +102,18 @@ public class RoutePlanningService {
 
         return  RouteOptionDTO.available(routeName, MathUtils.round(totalDist), MathUtils.round(totalDur), 0.0, segments);
     }
-
+    public List<CityDTO> getAllCities() {
+        return cityRepository.findAll().stream().map(city -> {
+            CityDTO dto = new CityDTO();
+            dto.setId(city.getId());
+            dto.setName(city.getName());
+            dto.setCountry(city.getCountry());
+            dto.setLatitude(city.getLatitude());
+            dto.setLongitude(city.getLongitude());
+            dto.setIataCode(city.getIataCode());
+            return dto;
+        }).toList();
+    }
     private CityEntity findCity(String name, String country) {
 
         return cityRepository.findByNameAndCountry(name, country)

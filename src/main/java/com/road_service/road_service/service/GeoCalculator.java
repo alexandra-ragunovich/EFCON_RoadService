@@ -23,3 +23,4 @@ public class GeoCalculator {
         return (Math.toDegrees(Math.atan2(y, x)) + 360) % 360;
     }
 }
+ 
